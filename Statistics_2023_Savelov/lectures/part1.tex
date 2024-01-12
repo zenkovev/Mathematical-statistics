@@ -1,0 +1,334 @@
+\section{Введение}
+
+\begin{note}
+    Математическая статистика в каком-то смысле обратна к теории вероятностей. В теории вероятностей мы знаем природу явления, нам дана математическая модель, и мы хотим сделать выводы о том, что произойдёт. Например, у нас есть $n$ независимых одинаково распределённых случайных величин, $n \to \infty$, с экспоненциальным распределением, и мы хотим понять, куда сойдётся $\frac{S_n}{n}$. Видно, что в этом примере уже дано вероятностное пространство $(\Omega, \F, P)$.
+
+    В математической статистике нам, грубо говоря, даны экспериментальные данные, и мы хотим построить по ним математическую модель. Например, проверить гипотезу, что в каком-то казино вероятность выпадения конкретной грани кубика равна $\frac{1}{6}$. Или изучить зависимость или независимость каких-либо явлений: верно ли, что социальные люди являются наиболее активными пользователями гаджетов? Математическая статистика позволяет понять, какая из теорий наиболее соответствует практике.
+\end{note}
+
+\begin{note}
+    Далее будем использовать обозначение $i.i.d.$ --- independent and identically distributed --- независимые одинаково распределённые (случайные величины, случайные векторы). Под независимостью понимается независимость в совокупности.
+\end{note}
+
+\begin{example}
+    Введём случайные величины $\{\xi_1, \xi_2, \hdots\}$, $\xi_i$ --- срок службы электрического прибора. Пусть $\{\xi_i\}_{i=1}^\infty$ --- $i.i.d.$, то есть приборы одинаковые и перегорают независимо.
+
+    Нам интересно среднее время жизни одного прибора $\Theta = \E\xi_1 (= \E\xi_2 = \hdots)$. Считаем, что в среднем приборы служат конечное время, то есть $0 \le \Theta < +\infty$.
+
+    Зная время жизни $n$ приборов, хотим оценить среднее время жизни прибора. Возникает идея, что в качестве оценки можно взять
+    \[
+        \hat{\Theta} = \hat{\Theta}(\omega) = \frac{\sum_{i=1}^n \xi_i(\omega)}{n},\ \omega \in \Omega
+    \]
+
+    По Усиленному Закону Больших Чисел $\hat{\Theta} \xrightarrow{\text{п.н.}} \Theta$, поэтому оценка, действительно, логична, то есть в каком-то смысле близка к тому, что оценивает.
+\end{example}
+
+\begin{note}
+    Здесь использовали классические для статистики обозначения: $\Theta$ --- какой-то оцениваемый параметр, $\hat{\Theta}$ --- оценка этого параметра.
+\end{note}
+
+\begin{note}
+    В связи с примером сразу возникает несколько наблюдений. В-первых, мы предложили конкретную оценку и ничего не сказали про то, какие можно придумать ещё оценки, и главное: можно ли оценить лучше? Во-вторых, если $n$ малое, например, $n = 2$, то выводов особо не сделаешь, так что нас будут интересовать ситуации, когда $n \to \infty$.   
+\end{note}
+
+\section{Напоминание из теории вероятностей}
+
+\subsection{Сходимости случайных векторов}
+
+\begin{definition}
+    Пусть $\xi, \{\xi_n\}_{n=1}^\infty$ --- случайные векторы размерности $m$.
+    \begin{enumerate}
+        \item Сходимость почти наверное (с вероятностью 1)
+        \[
+            \xi_n \xrightarrow{\text{п.н.}} \xi \Longleftrightarrow P(\xi_n \to \xi) = 1
+        \]
+
+        При этом знаем, что $\{\xi_n \to \xi\} = \{\omega \in \Omega: \xi_n(\omega) \to \xi(\omega)\}$ всегда измеримо.
+
+        \item Сходимость по вероятности
+        \[
+            \xi_n \xrightarrow{P} \xi \Longleftrightarrow \forall \eps > 0 \ \ P(\|\xi_n - \xi\|_2 > \eps) \xrightarrow[n \to \infty]{} 0
+        \]
+
+        Здесь используется обозначение $\|x\|_p = (|x_1|^p + \hdots + |x_m|^p)^{\frac{1}{p}}$, $p \ge 1$. Так как при любом таком $p$ это --- норма, и все нормы в $\R^m$ эквивалентны, то в определении вместо 2 можно поставить любое другое $p$.
+
+        \item Сходимость в $L_p$ (в среднем порядка $p$)
+        \[
+            \xi_n \xrightarrow{L_p} \xi \Longleftrightarrow \E(\|\xi_n - \xi\|_p)^p \xrightarrow[n \to \infty]{} 0
+        \]
+
+        Здесь $p \ge 1$. Можно подумать о том, почему мы не рассматриваем меньшие $p$: подумать о необходимых условиях метрического/линейного нормированного пространства --- остаётся упражением.
+
+        \item Сходимость по распределению
+        \[
+            \xi_n \xrightarrow{d} \xi \Longleftrightarrow \E f(\xi_n) \to \E f(\xi) \ \ \forall f \colon \R^m \to \R \text{ --- непрерывная ограниченная}
+        \]
+
+        Про условие ограниченности часто забывают, а оно важно: без ограниченности может перестать существовать математическое ожидание.
+
+        Эквивалентное определение: $\xi_n \xrightarrow{d} \xi \Longleftrightarrow$ функции распределения $\xi_n$ сходятся к функции распределения $\xi$ в каждой точке непрерывности последней.
+    \end{enumerate}
+\end{definition}
+
+\begin{proposition}~
+    \begin{enumerate}
+        \item $\xi_n \xrightarrow{\text{п.н.}} \xi \Longleftrightarrow \xi_n^{(i)} \xrightarrow{\text{п.н.}} \xi^{(i)} \ \ \forall i = 1, \hdots, m$
+
+        \item $\xi_n \xrightarrow{P} \xi \Longleftrightarrow \xi_n^{(i)} \xrightarrow{P} \xi^{(i)} \ \ \forall i = 1, \hdots, m$
+
+        \item $\xi_n \xrightarrow{L_p} \xi \Longleftrightarrow \xi_n^{(i)} \xrightarrow{L_p} \xi^{(i)} \ \ \forall i = 1, \hdots, m$
+
+        \item $\xi_n \xrightarrow{d} \xi \Longrightarrow \xi_n^{(i)} \xrightarrow{d} \xi^{(i)} \ \ \forall i = 1, \hdots, m$
+    \end{enumerate}
+\end{proposition}
+
+\begin{note}
+    Для сходимости по распределению следствие есть только в одну сторону --- явно тоже проговорим.
+\end{note}
+
+\begin{proof}
+    Докажем с помощью теоретико-множественных соображений.
+
+    \begin{enumerate}
+        \item
+        \[
+            \cap_{i=1}^m \{\xi_n^{(i)} \to \xi^{(i)}\} = \{\xi_n \to \xi\} \subset \{\xi_n^{(j)} \to \xi^{(j)}\},\ 1 \le j \le m
+        \]
+        Отсюда получаем, что:
+        \begin{align*}
+            & P(\cap_{i=1}^m \{\xi_n^{(i)} \to \xi^{(i)}\}) \le P(\xi_n \to \xi) \le P(\xi_n^{(j)} \to \xi^{(j)}),\ 1 \le j \le m
+            \\
+            & P(\cap_{i=1}^m \{\xi_n^{(i)} \to \xi^{(i)}\}) = 1 \Lra P(\xi_n^{(i)} \to \xi^{(i)}) = 1 \ \ \forall i = 1, \hdots, m
+            \\
+            & \Downarrow
+            \\
+            & P(\xi_n \to \xi) = 1 \Lra P(\xi_n^{(i)} \to \xi^{(i)}) = 1 \ \ \forall i = 1, \hdots, m
+        \end{align*}
+        Последнее в точности означает, что:
+        \[
+            \xi_n \xrightarrow{\text{п.н.}} \xi \Lra \xi_n^{(i)} \xrightarrow{\text{п.н.}} \xi^{(i)} \ \ \forall i = 1, \hdots, m
+        \]
+
+        \item Возьмём произвольное $\eps > 0$. Из определения нормы $\| \cdot \|_2$ следует:
+        \begin{align*}
+            & |\xi_n^{(j)} - \xi^{(j)}| > \eps \Ra \|\xi_n - \xi\|_2 > \eps \Ra \exists i \in \{1, \hdots, m\} \ \ |\xi_n^{(i)} - \xi^{(i)}| > \frac{\eps}{\sqrt{m}},\ 1 \le j \le m
+            \\
+            & \{|\xi_n^{(j)} - \xi^{(j)}| > \eps\} \subset \{\|\xi_n - \xi\|_2 > \eps\} \subset \bigcup_{i=1}^m \set{|\xi_n^{(i)} - \xi^{(i)}| > \frac{\eps}{\sqrt{m}}},\ 1 \le j \le m
+            \\
+            & P(|\xi_n^{(j)} - \xi^{(j)}| > \eps) \le P(\|\xi_n - \xi\|_2 > \eps) \le \sum_{i=1}^m P \ps{|\xi_n^{(i)} - \xi^{(i)}| > \frac{\eps}{\sqrt{m}}},\ 1 \le j \le m
+        \end{align*}
+
+        Отсюда всё мгновенно доказали, действительно:
+        \begin{align*}
+            & P \ps{|\xi_n^{(i)} - \xi^{(i)}| > \frac{\eps}{\sqrt{m}}} \xrightarrow[n \to \infty]{} 0 \ \ \forall i \in \{1, \hdots, m\} \Ra
+            \\
+            & \Ra P(\|\xi_n - \xi\|_2 > \eps) \xrightarrow[n \to \infty]{} 0 \Ra P \ps{|\xi_n^{(i)} - \xi^{(i)}| > \eps} \xrightarrow[n \to \infty]{} 0 \ \ \forall i \in \{1, \hdots, m\}
+            \\
+            & \Downarrow
+            \\
+            & P \ps{|\xi_n^{(i)} - \xi^{(i)}| > \eps} \xrightarrow[n \to \infty]{} 0 \ \ \forall i \in \{1, \hdots, m\} \ \ \forall \eps > 0 \Lra P(\|\xi_n - \xi\|_2 > \eps) \xrightarrow[n \to \infty]{} 0 \ \ \forall \eps > 0
+            \\
+            & \Downarrow
+            \\
+            & \xi_n \xrightarrow{P} \xi \Longleftrightarrow \xi_n^{(i)} \xrightarrow{P} \xi^{(i)} \ \ \forall i = 1, \hdots, m
+        \end{align*}
+
+        \item Непосредственно следует из того, что:
+        \begin{align*}
+            & \E(\|\xi_n - \xi\|_p)^p = \E \ps{\sum_{i=1}^m |\xi_n^{(i)} - \xi^{(i)}|^p} = \sum_{i=1}^m \E |\xi_n^{(i)} - \xi^{(i)}|^p
+            \\
+            & \Downarrow
+            \\
+            & \E(\|\xi_n - \xi\|_p)^p \xrightarrow[n \to \infty]{} 0 \Lra \E |\xi_n^{(i)} - \xi^{(i)}|^p \xrightarrow[n \to \infty]{} 0 \ \ \forall i \in \{1, \hdots, m\}
+        \end{align*}
+
+        \item Зафиксируем произвольную непрерывную ограниченную функцию $g \colon \R \to \R$. Рассмотрим $h$ -- функцию-проектор, то есть $h(x_1, \dots, x_m) = x_i$. Тогда $g \circ h$ непрерывна как композиция непрерывных и ограничена в силу ограниченности $g$. Получаем:
+        \[
+            \E g(\xi_n^{(i)}) = \E g \circ h(\xi_n) \xrightarrow[n \to \infty]{} \E g \circ h(\xi) = \E g(\xi^{(i)})
+        \]
+    \end{enumerate}
+\end{proof}
+
+\begin{note} (Связь сходимостей)
+    \begin{align*}
+        & \xi_n \xrightarrow{\text{п.н.}} \xi \Ra \xi_n \xrightarrow{P} \xi
+        \\
+        & \xi_n \xrightarrow{L_p} \xi \Ra \xi_n \xrightarrow{P} \xi
+        \\
+        & \xi_n \xrightarrow{P} \xi \Ra \xi_n \xrightarrow{d} \xi
+    \end{align*}
+    При этом всех остальных импликаций нет.
+\end{note}
+
+\begin{proposition}
+    Пусть $\{\xi_n\}_{n=1}^\infty$ --- случайные векторы в $\R^m$, $c \in \R^m$, $c = const$. Тогда выполнено $\xi_n \xrightarrow{d} c \Ra \xi_n \xrightarrow{P} c$.
+\end{proposition}
+
+\begin{proof}
+    Доказательство для одномерного случая можно посмотреть в конспекте курса по теории вероятностей Шабанова за 2023 год.
+
+    Выведем многомерный случай из одномерного:
+    \[
+        \xi_n \xrightarrow{d} c \Ra \xi_n^{(i)} \xrightarrow{d} c^{(i)} \Ra \\\xi_n^{(i)} \xrightarrow{P} c^{(i)} \Ra \xi_n \xrightarrow{P} c 
+    \]
+\end{proof}
+
+\begin{theorem} (О наследовании сходимостей)
+    Пусть $\xi, \{\xi_n\}_{n=1}^\infty$ -- случайные векторы в $\R^m$. Пусть существует борелевское множество $B \in \B(\R^m)$ такое, что $P(\xi \in B) = 1$ и $h \colon \R^m \to \R^k$ непрерывна в каждой точке $B$. Тогда
+    \begin{enumerate}
+        \item $\xi_n \xrightarrow{\text{п.н.}} \xi \Ra h(\xi_n) \xrightarrow{\text{п.н.}} h(\xi)$
+
+        \item $\xi_n \xrightarrow{P} \xi \Ra h(\xi_n) \xrightarrow{P} h(\xi)$
+
+        \item $\xi_n \xrightarrow{d} \xi \Ra h(\xi_n) \xrightarrow{d} h(\xi)$
+    \end{enumerate}
+\end{theorem}
+
+\begin{note}
+    Почему не хотим просто потребовать, что $h$ непрерывна? Например, из сходимости $\xi_n \to \xi$ часто хотим получить сходимость $\frac{1}{\xi_n} \to \frac{1}{\xi}$, тогда $h(x) = \frac{1}{x}$ будет непрерывна всюду, кроме нуля, и обычно точку ноль как множество нулевой вероятности можем не учитывать. То, что $P(\xi \in B) = 1$, означает, что $\xi$ обычно не попадает в проблемные точки.
+\end{note}
+
+\begin{proof}~
+    \begin{enumerate}
+        \item Хотим доказать, что $P(h(\xi_n) \to h(\xi)) = 1$. Действительно:
+        \[
+            P(h(\xi_n) \to h(\xi)) \ge P(h(\xi_n) \to h(\xi),\ \xi \in B) \ge P(\xi_n \to \xi,\ \xi \in B) = 1    
+        \]
+
+        \item Докажем от противного. Если $h(\xi_n) \ \cancel{\xrightarrow{P}} \ h(\xi)$, то:
+        \[
+            \exists \eps_0,\ \delta_0,\ \{n_k\}_{k=1}^\infty \ \ \forall k \ P(\|h(\xi_{n_k}) - h(\xi)\|_2 > \eps_0) \ge \delta_0
+        \]
+
+        Вспомним факт из прошлого семестра: из последовательности случайных векторов, сходящихся по вероятности, можно выделить сходящуюся почти наверное подпоследовательность. Он доказывался в одномерном случае, но просто обобщается на многомерный: сначала выберем подпоследовательность, сходящуюся почти наверное по первой компоненте, затем из неё подпоследовательность, сходящуюся почти наверное по второй компоненте, и так далее.
+
+        Так как $\xi_{n_k} \xrightarrow{P} \xi$, то можем выделить подпоследовательность, сходящуюся почти наверное, $\xi_{n_{k_s}} \xrightarrow{\text{п.н.}} \xi$. Из уже доказанного получаем:
+        \[
+            h(\xi_{n_{k_s}}) \xrightarrow{\text{п.н.}} h(\xi) \Ra h(\xi_{n_{k_s}}) \xrightarrow{P} h(\xi)
+        \]
+
+        Последнее противоречит тому, что:
+        \[
+            \forall s \ P(\|h(\xi_{n_{k_s}}) - h(\xi)\|_2 > \eps_0) \ge \delta_0
+        \]
+
+        \item Чтобы не возиться с техническими деталями, докажем для непрерывных функций $h$. Общий случай рассмотрен в конспекте теории вероятностей Шабанова.
+
+        Для любой непрерывной ограниченной функции $f \colon \R^k \to \R$ имеем: $f \circ h$ непрерывна и ограничена, как композиция непрерывных и в силу ограниченности $f$. Отсюда:
+        \[
+            \xi_n \xrightarrow{d} \xi \Ra \E f \circ h(\xi_n) \to \E f \circ h(\xi) \Ra \E f(h(\xi_n)) \to \E f(h(\xi)) \Ra h(\xi_n) \xrightarrow{d} h(\xi)
+        \]        
+    \end{enumerate}
+\end{proof}
+
+\begin{theorem} (Обобщённая лемма Слуцкого, б/д)
+    Пусть $\xi_n \xrightarrow{d} \xi$ в $\R^m$, $\eta_n \xrightarrow{d} c = const$ в $\R^s$. Тогда имеет место сходимость случайных векторов в $\R^{m+s}$
+    \[
+        \begin{pmatrix}
+            \xi_n \\ \eta_n
+        \end{pmatrix} \xrightarrow{d}
+        \begin{pmatrix}
+            \xi \\ c
+        \end{pmatrix}
+    \]
+\end{theorem}
+
+\begin{corollary} (Лемма Слуцкого)
+    Пусть $\xi_n \xrightarrow{d} \xi$ в $\R$, $\eta_n \xrightarrow{d} c = const$ в $\R$. Тогда
+    \begin{align*}
+        & \xi_n + \eta_n \xrightarrow{d} \xi + c
+        \\
+        & \xi_n \eta_n \xrightarrow{d} \xi \cdot c
+    \end{align*}
+\end{corollary}
+
+\begin{proof}
+    В силу обобщённой леммы Слуцкого получаем сходимость в $\R^2$:
+    \[
+        \begin{pmatrix}
+            \xi_n \\ \eta_n
+        \end{pmatrix} \xrightarrow{d}
+        \begin{pmatrix}
+            \xi \\ c
+        \end{pmatrix}
+    \]
+
+    Применение теоремы о наследовании сходимости для функции $h(x, y) = x + y$ в первом случае и для $h(x, y) = xy$ во втором случае завершает доказательство.
+\end{proof}
+
+\begin{note}
+    Если в условиях леммы Слуцкого $c \neq 0$, то $\frac{\xi_n}{\eta_n} \xrightarrow{d} \frac{\xi}{c}$. Это следует из того, что по теореме о наследовании сходимости $\frac{1}{\eta_n} \xrightarrow{d} \frac{1}{c}$.
+\end{note}
+
+\begin{proposition} (Дельта-метод)
+    Пусть $\xi_n \xrightarrow{d} \xi$, где $\xi_n$, $\xi$ -- случайные величины. Пусть даны функция $H \colon \R \to \R$, $H$ дифференцируема в точке $a$, и числовая последовательность $\{b_n\}_{n=1}^\infty$, $b_n \neq 0$, $b_n \to 0$. Тогда
+    \[
+        \frac{H(a+b_n\xi_n) - H(a)}{b_n} \xrightarrow{d} H'(a) \xi
+    \]
+\end{proposition}
+
+\begin{note}
+    Сначала посмотрим на это неформально. Так как $b_n \xi_n$ малы, то
+    \[
+        \frac{H(a+b_n\xi_n) - H(a)}{b_n} \approx \frac{H'(a) b_n\xi_n}{b_n} = H'(a) \xi_n \xrightarrow{d} H'(a) \xi 
+    \]
+\end{note}
+
+\begin{proof}
+    Определим функцию $h$:
+    \[
+        h(x) = \System{
+            & \frac{H(a+x)-H(a)}{x},\ x \neq 0,
+            \\
+            & H'(a),\ x = 0
+        }
+    \]
+    
+    В силу леммы Слуцкого имеем сходимость $b_n \xi_n \xrightarrow{d} 0 \cdot \xi = 0$, тогда по теореме о наследовании сходимости $h(b_n \xi_n) \xrightarrow{d} h(0) = H'(a)$, так как $h$ непрерывна в точке $0$. Вновь применяем лемму Слуцкого, получим:
+    \[
+        \frac{H(a+b_n\xi_n) - H(a)}{b_n} = h(b_n \xi_n) \xi_n \xrightarrow{d} H'(a) \xi
+    \]
+
+    Первое равенство справедливо и при $\xi_n \neq 0$, и при $\xi_n = 0$ в конкретной точке, так что всё доказано.
+\end{proof}
+
+\begin{proposition} (Многомерный дельта-метод)
+    Пусть $\xi_n \xrightarrow{d} \xi$ в $\R^m$, даны $H \colon \R^m \to \R^s$ -- вектор-функция, у которой в точке $a$ существует матрица частных производных
+    \[
+        H'(a) = \ps{\frac{\partial H_i}{\partial x_j}(a)}_{i, j = 1, 1}^{s, m}
+    \]
+    Также, как и раньше, дана числовая последовательность $\{b_n\}_{n=1}^\infty$, $b_n \neq 0$, $b_n \to 0$. Тогда
+    \[
+        \frac{H(a+b_n\xi_n) - H(a)}{b_n} = h(b_n \xi_n) \xi_n \xrightarrow{d} H'(a) \xi
+    \]
+\end{proposition}
+
+\begin{note}
+    Доказывать не будем, но доказательство полностью аналогично одномерному дельта-методу. Формальное замечание: так как условие на существование матрицы частных производных слабее дифференцируемости в точке, полагаю, что аналог сходимости $h(b_n \xi_n) \xrightarrow{d} h(0)$ сначала нужно получить покоординатно, а затем, так как сходимость покомпонентно по распределению к константе влечёт сходимость по вероятности, получить векторную сходимость по распределению.
+\end{note}
+
+\subsection{Предельные теоремы для случайных векторов}
+
+Пусть $\{\xi_n\}_{n=1}^\infty, \xi$ -- случайные векторы в $\R^m$. Обозначим $S_n = \xi_1 + \dots \xi_n$.
+
+\begin{itemize}
+    \item[ЗБЧ:] Пусть $\{\xi_n\}_{n=1}^\infty$ нескоррелированы, не обязательно одинаково распределены, равномерно ограничены дисперсии
+    \[
+        \sup_{n \ge 1,\ 1 \le i \le m} D \xi_n^{(i)} \le c < \infty
+    \]
+
+    Тогда имеем сходимость по вероятности
+    \[
+        \frac{S_n - \E S_n}{n} \xrightarrow{P} 0
+    \]
+
+    \item[УЗБЧ:] Пусть $\{\xi_n\}_{n=1}^\infty$ -- $i.i.d.$, $\E\xi_1$ конечно. Тогда
+    \[
+        \frac{S_n}{n} \xrightarrow{\text{п.н.}} \E\xi_1
+    \]
+
+    \item[ЦПТ:] Пусть $\{\xi_n\}_{n=1}^\infty$ -- $i.i.d.$, существует матрица ковариаций $D\xi_1$. Тогда
+    \[
+        \sqrt{n} \ps{\frac{S_n}{n} - \E\xi_1} \xrightarrow{d} N(0, D\xi_1)
+    \]
+\end{itemize}
