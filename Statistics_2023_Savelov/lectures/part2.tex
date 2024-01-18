@@ -307,11 +307,11 @@
         \begin{multline*}
             I_X(\theta) = \E_\theta U_\theta^2(X) = \E_\theta \ps{\frac{\partial}{\partial \theta} \ln p_\theta(X)}^2 = \E_\theta \ps{\sum_{i=1}^n \frac{\partial}{\partial \theta} \ln p_\theta(X_i)}^2 =
             \\
-            = \sum_{i=1}^n \E_\theta \ps{\frac{\partial}{\partial \theta} \ln p_\theta(X_i)}^2 + \sum_{i,j=1}^n \E_\theta \ps{\frac{\partial}{\partial \theta} \ln p_\theta(X_i)} \ps{\frac{\partial}{\partial \theta} \ln p_\theta(X_j)} =
+            = \sum_{i=1}^n \E_\theta \ps{\frac{\partial}{\partial \theta} \ln p_\theta(X_i)}^2 + \sum_{i \neq j} \E_\theta \ps{\frac{\partial}{\partial \theta} \ln p_\theta(X_i)} \ps{\frac{\partial}{\partial \theta} \ln p_\theta(X_j)} =
             \\
-            = \sum_{i=1}^n \E_\theta \ps{\frac{\partial}{\partial \theta} \ln p_\theta(X_i)}^2 + \sum_{i,j=1}^n \E_\theta \ps{\frac{\partial}{\partial \theta} \ln p_\theta(X_i)} \E_\theta \ps{\frac{\partial}{\partial \theta} \ln p_\theta(X_j)} =
+            = \sum_{i=1}^n \E_\theta \ps{\frac{\partial}{\partial \theta} \ln p_\theta(X_i)}^2 + \sum_{i \neq j} \E_\theta \ps{\frac{\partial}{\partial \theta} \ln p_\theta(X_i)} \E_\theta \ps{\frac{\partial}{\partial \theta} \ln p_\theta(X_j)} =
             \\
-            = \sum_{i=1}^n i(\theta) + \sum_{i,j=1}^n (\E_\theta U_\theta(X_1))^2 = n i(\theta)
+            = \sum_{i=1}^n i(\theta) + \sum_{i \neq j} (\E_\theta U_\theta(X_1))^2 = n i(\theta)
         \end{multline*}
     \end{enumerate}
 \end{proof}
