@@ -273,7 +273,7 @@
     \begin{itemize}
         \item[$2 \Ra 1$] Пусть $X$ -- выборка, $x$ -- конкретное значение той же размерности. Тогда распишем условное распределение, достаточно проверить его независимость от $\theta$ в конкретной точке $x$:
         \[
-            P_\theta(X = x | T(X) = t) = \frac{P_\theta(X = x, T(X) = t)}{P(T(X) = t)} = \System{
+            P_\theta(X = x | T(X) = t) = \frac{P_\theta(X = x, T(X) = t)}{P_\theta(T(X) = t)} = \System{
                 & 0,\ T(X) \neq t,
                 \\
                 & \frac{P_\theta(X = x)}{P_\theta(T(X) = t)},\ \text{иначе}
@@ -456,7 +456,7 @@
         \item Проверяем на полноту, если экспоненциальное семейство распределений, то всё хорошо, иначе, кажется, грустить и проверять по определению.
         \item Если полная, то решаем уравнение несмещённости, подбирая $g$:
         \[
-            \E_\theta g(T(X)) = \tau(\theta) \ \ \forall \theta \in Theta
+            \E_\theta g(T(X)) = \tau(\theta) \ \ \forall \theta \in \Theta
         \]
         \item Если $D_\theta g(T(X)) < \infty$, то $g(T(X))$ -- оптимальная оценка.        
     \end{enumerate}
