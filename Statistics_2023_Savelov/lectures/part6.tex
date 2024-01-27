@@ -1,0 +1,514 @@
+\section{Линейная регрессия}
+
+\subsection{Некоторые семейства распределений}
+
+\subsubsection{Распределение хи-квадрат}
+
+\begin{definition}
+    Пусть $\xi_1, \dots, \xi_k \sim N(0, 1)$ -- независимые одинаково распределённые случайные величины. Распределением хи-квадрат с $k$ степенями свободы называется распределение случайной величины $\xi = \xi_1^2 + \dots + \xi_k^2$, обозначается $\xi \sim \chi^2_k$.
+\end{definition}
+
+\begin{proposition}
+    Распределение хи-квадрат с $k$ степенями свободы можно эквивалентно определить как распределение случайной величины $\xi \sim \Gamma\ps{\frac{1}{2}, \frac{k}{2}}$.
+\end{proposition}
+
+\begin{proof}~
+    \begin{itemize}
+        \item Пусть $\xi_1, \dots, \xi_k \sim N(0, 1)$ -- независимые одинаково распределённые случайные величины. Нужно доказать, что $\xi = \xi_1^2 + \dots + \xi_k^2 \sim \Gamma\ps{\frac{1}{2}, \frac{k}{2}}$.
+
+        \item Начнём с одномерного случая: $\xi \sim N(0, 1)$, хотим доказать: $\xi^2 \sim \Gamma\ps{\frac{1}{2}, \frac{1}{2}}.$ Напомним плотности стандартных распределений:
+        \begin{align*}
+            N(a, \sigma^2) &\colon p(x) = \frac{1}{\sqrt{2 \pi \sigma^2}} e^{-\frac{(x-a)^2}{2 \sigma^2}}
+            \\
+            \Gamma(\alpha, \beta) &\colon p(x) = \frac{\alpha^\beta x^{\beta-1}}{\Gamma(\beta)} e^{-\alpha x} I\{x > 0\}
+        \end{align*}
+
+        Докажем с помощью метода характеристических функций. Напомним определение: если $\xi$ -- случайная величина, то $\phi_\xi(t) = \E e^{i \xi t}$ -- её характеристическая функция, и основное свойство: $\xi \stackrel{d}{=} \eta \Lra \phi_\xi(t) = \phi_\eta(t) \ \forall t \in \R$.
+
+        Пусть $\xi \sim N(0, 1)$, $\eta \sim \Gamma\ps{\frac{1}{2}, \frac{1}{2}}$, хотим доказать, что $\xi^2 \stackrel{d}{=} \eta$. Распишем характеристические функции:
+        \begin{align*}
+            & \phi_{\xi^2}(t) = \E e^{i \xi^2 t} = \int_{-\infty}^{+\infty} e^{i x^2 t} \frac{1}{\sqrt{2 \pi}} e^{-\frac{x^2}{2}} dx = 2 \int_0^{+\infty} \frac{1}{\sqrt{2 \pi}} e^{i x^2 t} e^{-\frac{x^2}{2}} dx
+            \\
+            & \phi_\eta(t) = \E e^{i \eta t} = \int_0^{+\infty} e^{ixt} \frac{(1/2)^{1/2} x^{-1/2}}{\Gamma(1/2)} e^{-\frac{x}{2}} dx = \int_0^{+\infty} \frac{e^{ixt} e^{-\frac{x}{2}}}{\Gamma(1/2) \sqrt{2}} \frac{dx}{\sqrt{x}}
+        \end{align*}
+
+        Во-первых, вспомним, что $\Gamma(1/2) = \sqrt{\pi}$, во-вторых, для второго интеграла сделаем замену $y = \sqrt{x}$, $dy = \frac{1}{2 \sqrt{x}} dx$, получим:
+        \begin{align*}
+            & \phi_{\xi^2}(t) = \int_0^{+\infty} \sqrt{\frac{2}{\pi}} e^{i x^2 t} e^{-\frac{x^2}{2}} dx
+            \\
+            & \phi_\eta(t) = \int_0^{+\infty} \frac{e^{iy^2t} e^{-\frac{y^2}{2}}}{\sqrt{2 \pi}} 2 dy = \int_0^{+\infty} \sqrt{\frac{2}{\pi}} e^{i y^2 t} e^{-\frac{y^2}{2}} dy
+        \end{align*}
+
+        Характеристические функции равны, так что одинаковая распределённость доказана.
+
+        \item Возвращаемся в общий случай: $\xi_1, \dots, \xi_k \sim N(0, 1)$ -- независимые одинаково распределённые случайные величины, нужно доказать: $\xi = \xi_1^2 + \dots + \xi_k^2 \sim \Gamma\ps{\frac{1}{2}, \frac{k}{2}}$. В силу уже доказанного все $\xi_i^2 \sim \Gamma\ps{\frac{1}{2}, \frac{1}{2}}$, в силу независимости $\xi_i^2$ и свойств гамма-распределения их сумма $\xi \sim \Gamma\ps{\frac{1}{2}, \frac{k}{2}}$.
+    \end{itemize}
+\end{proof}
+
+\begin{proposition} (Свойства распределения хи-квадрат)
+    \begin{enumerate}
+        \item $\xi \sim \chi^2_k,\ \eta \sim \chi^2_m,\ \xi \indep \eta \Ra \xi + \eta \sim \chi^2_{k+m}$
+
+        \item $\xi_k \sim \chi^2_k \Ra \frac{\xi_k}{k} \xrightarrow{d} 1$
+    \end{enumerate}    
+\end{proposition}
+
+\begin{proof}~
+    \begin{enumerate}
+        \item Непосредственно следует из определения.
+
+        \item Рассмотрим $\eta_1, \eta_2, \dots \sim N(0, 1)$ -- независимые одинаково распределённые случайные величины. Тогда $\E\eta_1^2 = D\eta_1 = 1$, обозначим $S_n = \eta_1^2 + \dots + \eta_n^2 \sim \chi^2_n$, в силу УЗБЧ получим:
+        \[
+            \frac{S_n}{n} \xrightarrow{\text{п.н.}} 1 \Ra \frac{S_n}{n} \xrightarrow{d} 1
+        \]
+
+        Теперь рассмотрим произвольные случайные величины $\xi_k \sim \chi^2_k$. Так как сходимость по распределению в силу своего определения зависит только от распределения случайных величин, здесь тоже можем записать:
+        \[
+            \frac{\xi_k}{k} \xrightarrow{d} 1
+        \]
+    \end{enumerate}
+\end{proof}
+
+\subsubsection{Распределение Стьюдента}
+
+\begin{definition}
+    Пусть случайные величины $\xi \sim N(0, 1)$, $\eta \sim \chi^2_k$, $\xi \indep \eta$. Распределением Стьюдента с $k$ степенями свободы называется распределение случайной величины $\zeta = \frac{\xi}{\sqrt{\eta / k}}$, обозначается $\zeta \sim T_k$.
+\end{definition}
+
+\begin{proposition} (Свойства распределения Стьюдента)
+    \begin{enumerate}
+        \item $\zeta \sim T_k \Ra -\zeta \sim T_k$
+        \item $T_1 \sim Cauchy(1)$
+        \item $\zeta_k \sim T_k \Ra \zeta_k \xrightarrow{d} N(0, 1)$
+    \end{enumerate}
+\end{proposition}
+
+\begin{proof}~
+    \begin{enumerate}
+        \item Следует из факта: $\xi \sim N(0, 1) \Ra -\xi \sim N(0, 1)$.
+
+        \item Пусть $\xi \sim N(0, 1)$, $\eta \sim N(0, 1)$, $\xi \indep \eta$. Тогда $\zeta = \frac{\xi}{\sqrt{\eta^2}} = \frac{\xi}{|\eta|} \sim T_1$. Плотность случайной величины $|\eta|$ записать не слишком трудно:
+        \[
+            p_{|\eta|}(x) = 2 \frac{1}{\sqrt{2 \pi}} e^{-\frac{x^2}{2}} I\{x > 0\}
+        \]
+        
+        В силу независимости $\xi$ и $\eta$ можем записать функцию распределения $\frac{\xi}{|\eta|}$ в виде:
+        \[
+            F_{\xi / |\eta|}(t) = \int_{x, y \colon x/y \le t} p_\xi(x) p_{|\eta|}(y) dx dy
+        \]
+
+        Так как $|\eta|$ принимает только положительные значения и по теореме Фубини:
+        \begin{multline*}
+            F_{\xi / |\eta|}(t) = \int_{x, y \colon x \le yt} p_\xi(x) p_{|\eta|}(y) dx dy =
+            \\
+            = \int_0^{+\infty} dy \cdot p_{|\eta|}(y) \int_{x \colon x \le yt} p_\xi(x) dx = \int_0^{+\infty} F_\xi(yt) p_{|\eta|}(y) dy
+        \end{multline*}
+
+        Сначала продифференцируем по параметру $t$, потом обоснуем корректность:
+        \begin{multline*}
+            p_{\xi / |\eta|}(t) = \frac{\partial}{\partial t} \int_0^{+\infty} F_\xi(yt) p_{|\eta|}(y) dy = \int_0^{+\infty} \frac{\partial}{\partial t} F_\xi(yt) p_{|\eta|}(y) dy =
+            \\
+            = \int_0^{+\infty} p_\xi(yt) y p_{|\eta|}(y) dy = \int_0^{+\infty} \frac{1}{\sqrt{2 \pi}} e^{-\frac{y^2t^2}{2}} \cdot y \cdot 2 \frac{1}{\sqrt{2 \pi}} e^{-\frac{y^2}{2}} dy =
+            \\
+            = \frac{1}{\pi} \int_0^{+\infty} e^{-\frac{y^2t^2}{2}} \cdot y \cdot e^{-\frac{y^2}{2}} dy = \frac{1}{\pi} \int_0^{+\infty} e^{-\frac{y^2(t^2+1)}{2}} y dy
+        \end{multline*}
+
+        Теперь нужно понять, почему имели право внести дифференцирование под знак интеграла. Применим теорему о дифференцируемости несобственного интеграла Римана по параметру: так как функция под интегралом справа, смотря на его последний вид, мажорируется как $\exp\ps{-\frac{y^2(t^2+1)}{2}} y \le \exp\ps{-\frac{y^2}{2}} y$, а $\int_0^{+\infty} e^{-\frac{y^2}{2}} y dy$ сходится, то интеграл справа сходится равномерно по $t$, функция под интегралом справа непрерывна, а интеграл слева под производной точно существует.
+
+        Осталось лишь досчитать полученный интеграл:
+        \[
+            p_{\xi / |\eta|}(t) = \frac{1}{\pi} \int_0^{+\infty} e^{-\frac{y^2(t^2+1)}{2}} d\frac{y^2}{2} = \frac{1}{\pi} \int_0^{+\infty} e^{-x(t^2+1)} dx = \frac{1}{\pi} \frac{-e^{-x(t^2+1)}}{t^2+1} \Bigr|_{x = 0}^{+\infty} = \frac{1}{\pi (t^2+1)}
+        \]
+
+        Получилась в точности плотность распределения Коши $Cauchy(1)$.
+
+        \item Пусть $\xi_k \sim N(0, 1)$, $\eta_k \sim \chi^2_k$, $\xi_k \indep \eta_k$, тогда имеем сходимости:
+        \[
+            \xi_k \xrightarrow{d} N(0, 1),\ \ \frac{\eta_k}{k} \xrightarrow{d} 1
+        \]
+
+        В силу теоремы о наследовании сходимости и леммы Слуцкого:
+        \[
+            \zeta_k = \frac{\xi_k}{\sqrt{\eta_k / k}} \sim T_k,\ \ \zeta_k \xrightarrow{d} N(0, 1)
+        \]
+    \end{enumerate}
+\end{proof}
+
+\subsubsection{Распределение Фишера}
+
+\begin{definition}
+    Пусть случайные величины $\xi \sim \chi^2_k$, $\eta \sim \chi^2_m$, $\xi \indep \eta$. Распределением Фишера с параметрами $k$, $m$ называется распределение случайной величины $\zeta = \frac{\xi/k}{\eta/m}$, обозначается $\zeta \sim F_{k, m}$.
+\end{definition}
+
+\begin{proposition} (Свойства распределения Фишера)
+    \begin{enumerate}
+        \item $\xi \sim T_m \Ra \xi^2 \sim F_{1, m}$
+        \item $\xi \sim F_{k, m} \Ra \frac{1}{\xi} \sim F_{m, k}$
+        \item $\xi_m \sim F_{k, m} \Ra k \xi_m \xrightarrow[m \to \infty]{d} \chi^2_k$
+        \item $\xi_{k, m} \sim F_{k, m} \Ra \xi_{k, m} \xrightarrow[k, m \to \infty]{d} 1$
+    \end{enumerate}
+\end{proposition}
+
+\begin{proof}~
+    \begin{enumerate}
+        \item Непосредственно следует из определения.
+        \item Непосредственно следует из определения.
+        \item Следует из того, что $\frac{1}{k} \chi^2_k \xrightarrow{d} 1$.
+        \item Следует из того, что $\frac{1}{k} \chi^2_k \xrightarrow{d} 1$.
+    \end{enumerate}
+\end{proof}
+
+\subsection{Линейная регрессионная модель}
+
+\subsubsection{Постановка задачи}
+
+\begin{example}
+    Есть два яблока массами $a$ и $b$ соответственно. На весах провели 6 измерений: 3 раза взвесили первое яблоко, 2 раза взвесили второе яблоко, 1 раз взвесили оба яблока вместе, весы имели какие-то случайные ошибки измерений $\eps_1, \dots, \eps_6$, которые, разумеется, не знаем. Хотим оценить массу каждого яблока, воспользовавшись всеми результатами измерений, иными словами, хотим найти $a$ и $b$, когда есть данные:
+    \[
+        \begin{pmatrix}
+            1 & 0 \\ 1 & 0 \\ 1 & 0 \\ 0 & 1 \\ 0 & 1 \\ 1 & 1
+        \end{pmatrix} \cdot
+        \begin{pmatrix}
+            a \\ b
+        \end{pmatrix} +
+        \begin{pmatrix}
+            \eps_1 \\ \eps_2 \\ \eps_3 \\ \eps_4 \\ \eps_5 \\ \eps_6
+        \end{pmatrix}
+    \]
+\end{example}
+
+\begin{itemize}
+    \item Сформулируем задачу в общем виде. Пусть есть наблюдение, являющееся случайным вектором $X \in \R^n$, который представляется в виде $X = l + \eps$, где $l$ -- неслучайный (детерминированный) неизвестный вектор, а $\eps$ -- случайный вектор, иными словами, $l$ -- оцениваемая величина, а $\eps$ -- ошибка измерений.
+
+    \item Про ошибки $\eps$ известно, что они несмещены, нескоррелированы и имеют одинаковую дисперсию, то есть $\E \eps = 0$, $D \eps = \sigma^2 I_n$, где $I_n$ -- единичная матрица размера $n$, ошибка одного измерения имеет дисперсию $\sigma^2 > 0$, $\sigma^2$ -- неизвестный параметр. Иными словами, измерительный прибор одинаково может ошибиться в обе стороны от реального значения, ошибки измерений не связаны между собой, погрешность прибора постоянна и неизвестна.
+
+    \item Про параметры $l$ известно, что $l \in L$ -- линейное подпространство $\R^n$. В примере про яблоки $L$ двумерно и является линейной оболочкой векторов $(1, 1, 1, 0, 0, 1)^T$ и $(0, 0, 0, 1, 1, 1)^T$.
+
+    \item Задача состоит в том, чтобы оценить неизвестные параметры $l$, $\sigma^2$, если подпространство $L$ задано с помощью своего базиса $Z_1, \dots, Z_k$, $\dim L = k$.
+
+    \item Неизвестный вектор $l \in L$ может быть выражен через базис $Z_1, \dots, Z_k$, составим матрицу из базисных векторов $Z = (Z_1, \dots, Z_k)$ -- матрица размера $n \times k$, тогда можем записать в матричном виде $l = Z \theta$, где $\theta = (\theta_1, \dots, \theta_k)^T$ -- неизвестные координаты $l$ в базисе $Z_1, \dots, Z_k$. Таким образом, задача сводится к оценке неизвестных параметров $\theta$, $\sigma^2$, где $\theta \in \R^k$.
+\end{itemize}
+
+\subsubsection{Метод наименьших квадратов}
+
+\begin{definition}
+    Оценка $\hat{\theta}(X) = \argmin_{\theta \in \R^k} \|X - Z\theta\|^2_2 = \argmin_{\theta \in \R^k} \tbr{X - Z\theta, X - Z\theta}$ называется оценкой наименьших квадратов ОНК для неизвестного параметра $\theta$.
+\end{definition}
+
+\begin{note}
+    Геометрический смысл ОНК: $Z \hat{\theta}(X) = \proj_L X$ -- проекция $X$ на подпространство $L$. В частности, из геометрических соображений, ОНК $\hat{\theta}(X)$ существует и единственна.
+\end{note}
+
+\begin{note}
+    Матрица $Z^T Z$ -- невырожденная квадратная матрица размера $k$. Действительно, её можно выразить через скалярные произведения векторов $Z_1, \dots, Z_k$:
+    \[
+        Z^T Z = \begin{pmatrix}
+            \tbr{Z_1, Z_1} & \tbr{Z_1, Z_2} & \hdots & \tbr{Z_1, Z_k} \\
+            \tbr{Z_2, Z_1} & \tbr{Z_2, Z_2} & \hdots & \tbr{Z_2, Z_k} \\
+            \vdots & \vdots & \ddots & \vdots \\
+            \tbr{Z_k, Z_1} & \tbr{Z_k, Z_2} & \hdots & \tbr{Z_k, Z_k}
+        \end{pmatrix}
+    \]
+    То есть $Z^T Z$ является матрицей Грама линейно независимых векторов $Z_1, \dots, Z_k$, тогда, как знаем из курса линейной алгебры, она невырождена.
+\end{note}
+
+\begin{proposition}
+    $\hat{\theta}(X) = (Z^T Z)^{-1} Z^T X$
+\end{proposition}
+
+\begin{proof}
+    Уже выяснили, что $\hat{\theta}(X)$ существует и единственна. Так как в ней достигается минимум функции $\|X - Z\theta\|^2_2$, то в ней зануляется градиент $\nabla_\theta \|X - Z\theta\|^2_2$. Этих соображений нам хватит, чтобы получить формулу:
+    \begin{align*}
+        & d \|X - Z\theta\|^2_2 = d \tbr{X - Z\theta, X - Z\theta} = 2 \tbr{X - Z\theta, -Z d\theta} = \tbr{-2 Z^T (X - Z \theta), d\theta}
+        \\
+        & \nabla_\theta \|X - Z\theta\|^2_2 = -2 Z^T (X - Z \theta)
+        \\
+        & -2 Z^T (X - Z \hat{\theta}) = 0 \ \Ra \ Z^T X = Z^T Z \hat{\theta} \ \Ra \ \hat{\theta} = (Z^T Z)^{-1} Z^T X
+    \end{align*}
+\end{proof}
+
+\begin{proposition}
+    $\E\hat{\theta}(X) = \theta$, $D\hat{\theta}(X) = \sigma^2 (Z^T Z)^{-1}$
+\end{proposition}
+
+\begin{proof}~
+    \begin{itemize}
+        \item Начнём с простых свойств математического ожидания и дисперсии. Можно было бы сослаться на курс теории вероятностей, но так как они простые, мы поймём, откуда они берутся.
+
+        Математическое ожидание случайного вектора и случайной матрицы берётся покомпонентно. Дисперсию, т.е. матрицу ковариаций, можно записать в следующем виде:
+        \begin{multline*}
+            D\xi = D\begin{pmatrix}
+                \xi_1 \\ \vdots \\ \xi_n
+            \end{pmatrix} = \begin{pmatrix}
+                \cov(\xi_1, \xi_1) & \cov(\xi_1, \xi_2) & \hdots & \cov(\xi_1, \xi_n) \\
+                \cov(\xi_2, \xi_1) & \cov(\xi_2, \xi_2) & \hdots & \cov(\xi_2, \xi_n) \\
+                \vdots & \vdots & \ddots & \vdots \\
+                \cov(\xi_n, \xi_1) & \cov(\xi_n, \xi_2) & \hdots & \cov(\xi_n, \xi_n)              
+            \end{pmatrix} =
+            \\
+            = \E \begin{pmatrix}
+                (\xi_1-\E\xi_1)(\xi_1-\E\xi_1) & (\xi_1-\E\xi_1)(\xi_2-\E\xi_2) & \hdots & (\xi_1-\E\xi_1)(\xi_n-\E\xi_n) \\
+                (\xi_2-\E\xi_2)(\xi_1-\E\xi_1) & (\xi_2-\E\xi_2)(\xi_2-\E\xi_2) & \hdots & (\xi_2-\E\xi_2)(\xi_n-\E\xi_n) \\
+                \vdots & \vdots & \ddots & \vdots \\
+                (\xi_n-\E\xi_n)(\xi_1-\E\xi_1) & (\xi_n-\E\xi_n)(\xi_2-\E\xi_2) & \hdots & (\xi_n-\E\xi_n)(\xi_n-\E\xi_n)
+            \end{pmatrix} =
+            \\
+            = \E \sbr{\begin{pmatrix}
+                \xi_1 - \E \xi_1 \\ \vdots \\ \xi_n - \E\xi_n
+            \end{pmatrix} \begin{pmatrix}
+                \xi_1 - \E \xi_1 & \hdots & \xi_n - \E\xi_n
+            \end{pmatrix}} = \E \sbr{(\xi - \E\xi) (\xi - \E\xi)^T}
+        \end{multline*}
+
+        И, для фиксированной матрицы $A$ размера $m \times n$, воспользовавшись линейностью математического ожидания:
+        \begin{align*}
+            & \E (A\xi) = A \cdot \E \xi
+            \\
+            & D (A \xi) = \E [(A\xi - \E(A\xi))(A\xi - \E(A\xi))^T] = \E [A (\xi - \E\xi) (A (\xi - \E\xi))^T] =
+            \\
+            & \hspace{1cm} = \E [A (\xi-\E\xi)(\xi-\E\xi)^T A^T] = A \cdot \E[(\xi-\E\xi)(\xi-\E\xi)^T] \cdot A^T = A \cdot D\xi \cdot A^T
+        \end{align*}
+
+        \item После этого, заметив также, что $(Z^T Z)^T = Z^T Z$, из-за чего $((Z^T Z)^{-1})^T = (Z^T Z)^{-1}$, мгновенно получим утверждение:
+        \begin{align*}
+            & \E \hat{\theta} = \E ((Z^T Z)^{-1} Z^T X) = (Z^T Z)^{-1} Z^T \E X = (Z^T Z)^{-1} Z^T \E (Z \theta + \eps) = (Z^T Z)^{-1} Z^T Z \theta = \theta
+            \\
+            & D \hat{\theta} = D ((Z^T Z)^{-1} Z^T X) = (Z^T Z)^{-1} Z^T DX ((Z^T Z)^{-1} Z^T)^T =
+            \\
+            & \hspace{1cm} = (Z^T Z)^{-1} Z^T D(Z \theta + \eps) Z (Z^T Z)^{-1} = (Z^T Z)^{-1} Z^T D\eps Z (Z^T Z)^{-1} =
+            \\
+            & \hspace{1cm} = \sigma^2 (Z^T Z)^{-1} Z^T I_n Z (Z^T Z)^{-1} = \sigma^2 (Z^T Z)^{-1}
+        \end{align*}       
+    \end{itemize}
+\end{proof}
+
+\begin{corollary}
+    $\hat{\theta}(X)$ -- несмещённая оценка $\theta$.
+\end{corollary}
+
+\begin{proposition}
+    $\E \|X - Z\hat{\theta}\|_2^2 = \sigma^2(n-k)$
+\end{proposition}
+
+\begin{proof}~
+    \begin{itemize}
+        \item Сначала распишем матожидание нормы вектора в матричном виде:
+        \[
+            \E \|X - Z\hat{\theta}\|_2^2 = \E \tbr{X - Z\hat{\theta}, X - Z\hat{\theta}} = \E [(X - Z\hat{\theta})^T (X - Z\hat{\theta})]
+        \]
+
+        \item Теперь заметим, что $\E (X - Z \hat{\theta}) = \E X - Z \E \hat{\theta} = Z\theta - Z\theta = 0$, из чего следует, что $D (X - Z \hat{\theta}) = \E [(X - Z \hat{\theta}) (X - Z \hat{\theta})^T]$. Хотим выразить полученную выше формулу $\E [(X - Z\hat{\theta})^T (X - Z\hat{\theta})]$ через дисперсию $D (X - Z \hat{\theta})$, чтобы потом из дисперсии можно было выносить константные матрицы. Проблема в том, что в дисперсии матрицы $(X - Z \hat{\theta})^T$ и $(X - Z \hat{\theta})$ перемножаются в другом порядке. Менять порядок произведения матриц нам позволяет след, действительно, для матриц $A \in Mat_{s \times t}$ и $B \in Mat_{t \times s}$ выполнено $\trace(AB) = \trace(BA)$, доказывается, тупо расписав по определению. Так как след без труда можно навесить на матрицу $(X - Z\hat{\theta})^T (X - Z\hat{\theta})$ размера $1 \times 1$, получим:
+        \begin{multline*}
+            \E \|X - Z\hat{\theta}\|_2^2 = \E [(X - Z\hat{\theta})^T (X - Z\hat{\theta})] = \E \trace [(X - Z\hat{\theta})^T (X - Z\hat{\theta})] =
+            \\
+            = \E \trace [(X - Z\hat{\theta}) (X - Z\hat{\theta})^T] = \trace \E [(X - Z\hat{\theta}) (X - Z\hat{\theta})^T] = \trace D (X - Z\hat{\theta})
+        \end{multline*}
+        
+        \item Теперь посмотрим на $X - Z\hat{\theta} = X - Z (Z^T Z)^{-1} Z^T X = (I_n - A) X$, где обозначили через $A = Z (Z^T Z)^{-1} Z^T$. Заметим два свойства матрицы $A$:
+        \begin{align*}
+            & A^T = (Z (Z^T Z)^{-1} Z^T)^T = Z ((Z^T Z)^{-1})^T Z^T = Z (Z^T Z)^{-1} Z^T = A
+            \\
+            & A^2 = Z (Z^T Z)^{-1} Z^T Z (Z^T Z)^{-1} Z^T = Z (Z^T Z)^{-1} Z^T = A
+        \end{align*}
+
+        Продолжим цепочку равенств:
+        \begin{multline*}
+            \E \|X - Z\hat{\theta}\|_2^2 = \trace D (X - Z\hat{\theta}) = \trace D [(I_n - A) X] = \trace [(I_n - A) DX (I_n - A)] =
+            \\
+            = \trace [(I_n - A) D(Z\theta + \eps) (I_n - A)] = \trace [(I_n - A) D\eps (I_n - A)] =
+            \\
+            = \sigma^2 \trace [(I_n - A) I_n (I_n - A)] = \sigma^2 \trace(I_n - 2A + A^2) = \sigma^2 \trace(I_n - 2A + A) =
+            \\
+            = \sigma^2 (\trace(I_n) - \trace(A)) = \sigma^2 (n - \trace(Z (Z^T Z)^{-1} Z^T)) = \sigma^2 (n - \trace(Z^T Z (Z^T Z)^{-1})) =
+            \\
+            = \sigma^2 (n - \trace(I_k)) = \sigma^2(n-k)
+        \end{multline*}
+    \end{itemize}
+\end{proof}
+
+\begin{corollary}
+    $\frac{\|X - Z\hat{\theta}\|_2^2}{n-k}$ -- несмещённая оценка $\sigma^2$.
+\end{corollary}
+
+\begin{theorem} (б/д)
+    Пусть $t = T\theta$ -- линейная вектор-функция от $\theta$, иными словами, $T \in Mat_{m \times k}$ -- матрица размера $m \times k$. Тогда оценка $\hat{t} = T \hat{\theta}$ является оптимальной оценкой $t$ в классе линейных несмещённых оценок, то есть в классе оценок вида $B X$, где $B \in Mat_{m \times n}$.
+\end{theorem}
+
+\begin{reminder}
+     Оптимальная оценка -- наилучшая оценка в равномерном подходе с квадратичной функцией потерь, рассматривается для классов, состоящих только из несмещённых оценок.
+\end{reminder}
+
+\subsection{Гауссовская линейная модель}
+
+\subsubsection{Оценки для гауссовской линейной модели}
+
+\begin{definition}
+    Рассматривается та же постановка задачи, что и в линейной регрессионной модели, $X = Z \theta + \eps$, но с дополнительным предположением о нормальности ошибок $\eps \sim N(0, \sigma^2 I_n)$, $\sigma^2 > 0$. В частности, для нормальных ошибок из нескоррелированности следует независимость.
+\end{definition}
+
+\begin{theorem} (Об ортогональном разложении, б/д)
+    Пусть $X \sim N(l, \sigma^2 I_n)$, в частности, такое выполнено в гауссовской линейной модели. Пусть $L_1, \dots, L_r$ -- попарно ортогональные подпространства $\R^n$, причём $L_1 \oplus \dots \oplus L_r = \R^n$. Тогда $\proj_{L_1} X, \dots, \proj_{L_r} X$ -- независимые в совокупности нормальные случайные векторы, причём:
+    \begin{align*}
+        & \E (\proj_{L_j} X) = \proj_{L_j} l,\ \ j = 1, \dots, r
+        \\
+        & \frac{1}{\sigma^2} \| \proj_{L_j} X - \proj_{L_j} l \|_2^2 \sim \chi^2_{\dim L_j},\ \ j = 1, \dots, r
+    \end{align*}
+\end{theorem}
+
+\begin{proposition}
+    В гауссовской линейной модели $S(X) = (\proj_L X, \|\proj_{L^\perp} X\|_2^2)$ является достаточной статистикой для параметров $l, \sigma^2$.
+\end{proposition}
+
+\begin{proof}
+    Напомним, что по критерию факторизации Неймана-Фишера достаточно проверить, что функция правдоподобия $f_{l, \sigma^2}(X)$ представляется в виде:
+    \[
+        f_{l, \sigma^2}(X) = \psi(S(X), l, \sigma^2) \cdot h(X)
+    \]
+    Здесь $\psi, h$ -- неотрицательные функции, $\psi$ измерима по $S$, $h$ измерима по $X$.
+
+    Так как ошибки $\eps_1, \dots, \eps_n$ и, следовательно, случайные величины $X_1, \dots, X_n$ независимы, то функция правдоподобия распадается в произведение:
+    \begin{multline*}
+        f_{l, \sigma^2}(X) = \prod_{i=1}^n f_{l, \sigma^2}(X_i) = \prod_{i=1}^n \frac{1}{\sqrt{2\pi\sigma^2}} \exp \ps{-\frac{(X_i - l_i)^2}{2 \sigma^2}} =
+        \\
+        = \ps{\frac{1}{\sqrt{2\pi\sigma^2}}}^n \exp \ps{-\frac{\sum_{i=1}^n (X_i - l_i)^2}{2 \sigma^2}} = \ps{\frac{1}{\sqrt{2\pi\sigma^2}}}^n \exp \ps{-\frac{\|X - l\|_2^2}{2 \sigma^2}}
+    \end{multline*}
+
+    Воспользуемся теоремой Пифагора и тем, что $l \in L$:
+    \begin{multline*}
+        \|X - l\|_2^2 = \|\proj_L (X-l)\|_2^2 + \|\proj_{L^\perp} (X-l)\|_2^2 =
+        \\
+        = \|\proj_L X - \proj_L l\|_2^2 + \|\proj_{L^\perp} X - \proj_{L^\perp} l\|_2^2 = \|\proj_L X - l\|_2^2 + \|\proj_{L^\perp} X\|_2^2
+    \end{multline*}
+
+    Тогда выполнено:
+    \[
+        f_{l, \sigma^2}(X) = \ps{\frac{1}{\sqrt{2\pi\sigma^2}}}^n \exp \ps{-\frac{\|\proj_L X - l\|_2^2 + \|\proj_{L^\perp} X\|_2^2}{2 \sigma^2}}
+    \]
+
+    Возьмём $h \equiv 1$, $\psi = f_{l, \sigma^2}$, в силу последнего равенства это и будет требуемое разложение.
+\end{proof}
+
+\begin{theorem} (б/д)
+    В гауссовской линейной модели $S(X) = (\proj_L X, \|\proj_{L^\perp} X\|_2^2)$ является полной достаточной статистикой для параметров $l, \sigma^2$.
+\end{theorem}
+
+\begin{corollary}~
+    \begin{itemize}
+        \item $\hat{\theta}$ -- оптимальная оценка для $\theta$
+        \item $Z \hat{\theta}$ -- оптимальная оценка для $l$
+        \item $\frac{\|X - Z \hat{\theta}\|_2^2}{n-k}$ -- оптимальная оценка для $\sigma^2$
+    \end{itemize}
+\end{corollary}
+
+\begin{proof}
+    Напомним, что оптимальная оценка -- наилучшая оценка в среднеквадратичном подходе в классе несмещённых оценок. Напомним также, что для оптимальности оценки достаточно, чтобы она была несмещённой, имела конечную дисперсию и являлась функцией от полной достаточной статистики.
+
+    Несмещённость всех оценок уже проверили. Конечность дисперсий для первых двух оценок тоже знаем, для первой даже явно считали дисперсию, вторая есть линейное преобразование первой, так что для неё тоже можно получить явную формулу. Для третьей: так как $X - Z\hat{\theta}$ является линейным преобразованием гауссовского вектора, то есть тоже гауссовским вектором, то $\|X - Z \hat{\theta}\|_2^2$ -- сумма квадратов нормальных распределений, поэтому дисперсия конечна, так как у нормального распределения все моменты конечны.
+
+    Осталось понять, что эти оценки являются функциями от полной достаточной статистики $(\proj_L X, \|\proj_{L^\perp} X\|_2^2)$. Действительно, так как:
+    \begin{align*}
+        & Z\hat{\theta} = \proj_L X
+        \\
+        & X = \proj_L X + \proj_{L^\perp} X \Ra X - Z \hat{\theta} = \proj_{L^\perp} X
+    \end{align*}
+
+    То можем записать:
+    \begin{align*}
+        & \hat{\theta} = (Z^T Z)^{-1} Z^T Z \theta = (Z^T Z)^{-1} Z^T \proj_L X
+        \\
+        & Z\hat{\theta} = \proj_L X
+        \\
+        & \frac{\|X - Z \hat{\theta}\|_2^2}{n-k} = \frac{\|\proj_{L^\perp} X\|_2^2}{n-k}
+    \end{align*}
+\end{proof}
+
+\begin{proposition}
+    В гауссовской линейной модели:
+    \begin{itemize}
+        \item $\hat{\theta}$ и $X - Z \hat{\theta}$ независимы
+        \item $\frac{1}{\sigma^2} \|Z \hat{\theta} - Z \theta\|_2^2 \sim \chi^2_k$
+        \item $\frac{1}{\sigma^2} \|X - Z\hat{\theta}\|_2^2 \sim \chi^2_{n-k}$
+        \item $\hat{\theta} \sim N(\theta, \sigma^2 (Z^T Z)^{-1})$
+    \end{itemize}
+\end{proposition}
+
+\begin{proof}
+    Так как $\R^n = L \oplus L^\perp$, $Z \hat{\theta} = \proj_L X$, $X - Z \hat{\theta} = \proj_{L^\perp} X$, $l = Z\theta \in L$, $\dim L = k$, $\dim L^\perp = n-k$, то по теореме об ортогональном разложении:
+    \begin{itemize}
+        \item $Z \hat{\theta}$ и $X - Z \hat{\theta}$ независимы
+        \item $\frac{1}{\sigma^2} \|Z \hat{\theta} - Z \theta\|_2^2 \sim \chi^2_k$
+        \item $\frac{1}{\sigma^2} \|X - Z\hat{\theta}\|_2^2 \sim \chi^2_{n-k}$
+    \end{itemize}
+
+    Тогда, так как $\hat{\theta} = (Z^T Z)^{-1} Z^T (Z \theta)$, то $\hat{\theta}$ и $X - Z \hat{\theta}$ тоже независимы. Теперь, так как уже считали $\E\hat{\theta} = \theta$, $D\hat{\theta} = \sigma^2 (Z^T Z)^{-1}$, а также $\hat{\theta}$ -- линейная функция от гауссовского вектора $X$, то есть тоже гауссовский вектор, то $\hat{\theta} \sim N(\theta, \sigma^2 (Z^T Z)^{-1})$.
+\end{proof}
+
+\subsubsection{Доверительные интервалы для гауссовской линейной модели}
+
+\begin{enumerate}
+    \item Доверительный интервал для $\sigma^2$
+
+    Как только что выяснили, имеет место распределение:
+    \[
+        \frac{1}{\sigma^2} \|X - Z\hat{\theta}\|_2^2 \sim \chi^2_{n-k}
+    \]
+
+    Пусть $u_\gamma$ -- $\gamma$-квантиль $\chi^2_{n-k}$. Тогда:
+    \[
+        P\ps{\sigma^2 \in \ps{0, \frac{\|X - Z\hat{\theta}\|_2^2}{u_{1-\gamma}}}} = P\ps{\frac{1}{\sigma^2} \|X - Z\hat{\theta}\|_2^2 > u_{1-\gamma}} = \gamma
+    \]
+
+    Получили точный доверительный интервал для $\sigma^2$ уровня доверия $\gamma$:
+    \[
+        \ps{0, \frac{\|X - Z\hat{\theta}\|_2^2}{u_{1-\gamma}}}
+    \]
+
+    \item Доверительный интервал для $\theta_i$, $1\le i \le k$
+
+    Как только, что выяснили, имеет место распределение:
+    \begin{align*}
+        & \hat{\theta} \sim N(\theta, \sigma^2 (Z^T Z)^{-1}) = N(\theta, \sigma^2 A),\ A = (Z^T Z)^{-1}
+        \\
+        & \Downarrow
+        \\
+        & \hat{\theta}_i \sim N(\theta_i, \sigma^2 A_{ii})
+    \end{align*}
+
+    Если $A_{ii} = 0$, то $\hat{\theta}_i \equiv const$, тогда все ковариации $\cov(\hat{\theta}_i, \hat{\theta}_j) = 0$, $1 \le j \le k$, то есть $(Z^T Z)^{-1}$ имеет тождественнно нулевую строку, что невозможно в силу невырожденности. Итак, выяснили, что $A_{ii} \neq 0$.
+
+    Тогда получаем распределение:
+    \[
+        \frac{\hat{\theta}_i - \theta_i}{\sqrt{\sigma^2 A_{ii}}} \sim N(0, 1)
+    \]
+
+    Для построения доверительного интервала хочется избавиться от $\sigma^2$. Так как знаем, что $\frac{1}{\sigma^2} \|X - Z\hat{\theta}\|_2^2 \sim \chi^2_{n-k}$, и $\hat{\theta}$ и $X - Z\hat{\theta}$ независимы, то получим распределение Стьюдента:
+    \[
+        \frac{\hat{\theta}_i - \theta_i}{\sqrt{\cancel{\sigma^2} A_{ii}}} \frac{\sqrt{n-k}}{\sqrt{\cancel{\frac{1}{\sigma^2}} \|X - Z\hat{\theta}\|_2^2}} = \sqrt{\frac{n-k}{A_{ii}}} \frac{\hat{\theta}_i - \theta_i}{\|X - Z\hat{\theta}\|_2} \sim T_{n-k}
+    \]
+        
+    Пусть $u_\gamma$ -- $\gamma$-квантиль $T_{n-k}$, знаем, что распределение Стьюдента симметрично относительно нуля. Тогда без труда получим точный доверительный интервал для $\theta_i$ уровня доверия $\gamma$:
+    \[
+        \ps{\hat{\theta_i} - \sqrt{\frac{A_{ii}}{n-k}} \|X - Z\hat{\theta}\|_2 \cdot u_{\frac{1+\gamma}{2}},\ \ \hat{\theta_i} + \sqrt{\frac{A_{ii}}{n-k}} \|X - Z\hat{\theta}\|_2 \cdot u_{\frac{1+\gamma}{2}}}
+    \]
+
+    \item Доверительное множество для $\theta$
+
+    Знаем, что:
+    \begin{align*}
+        & \frac{1}{\sigma^2} \|Z \hat{\theta} - Z \theta\|_2^2 \sim \chi^2_k
+        \\
+        & \frac{1}{\sigma^2} \|X - Z\hat{\theta}\|_2^2 \sim \chi^2_{n-k}
+        \\
+        & Z \hat{\theta} \text{ и } X - Z \hat{\theta} \text{ независимы}
+    \end{align*}
+
+    Тогда получим распределение Фишера:
+    \[
+        \frac{n-k}{k} \frac{\|Z \hat{\theta} - Z \theta\|_2^2}{\|X - Z\hat{\theta}\|_2^2} \sim F_{k, n-k}
+    \]
+
+    Пусть $u_\gamma$ -- $\gamma$-квантиль $F_{k, n-k}$, тогда строится точное доверительное множество (доверительный эллипсоид) для $\theta$ уровня доверия $\gamma$:
+    \[
+        \set{\theta \colon \frac{n-k}{k} \frac{\|Z \hat{\theta} - Z \theta\|_2^2}{\|X - Z\hat{\theta}\|_2^2} < u_{\gamma}}
+    \]
+\end{enumerate}
